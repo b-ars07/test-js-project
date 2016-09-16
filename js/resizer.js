@@ -88,14 +88,14 @@
       // чего-либо с другой обводкой.
 
       // Толщина линии.
-      this._ctx.lineWidth = 6;
+      //this._ctx.lineWidth = 6;
       // Цвет обводки.
-      this._ctx.strokeStyle = '#ffe753';
+      //this._ctx.strokeStyle = '#ffe753';
       // Размер штрихов. Первый элемент массива задает длину штриха, второй
       // расстояние между соседними штрихами.
-      this._ctx.setLineDash([15, 10]);
+      //this._ctx.setLineDash([15, 10]);
       // Смещение первого штриха от начала линии.
-      this._ctx.lineDashOffset = 7;
+      //this._ctx.lineDashOffset = 7;
 
       // Сохранение состояния канваса.
       // Подробней см. строку 132.
@@ -111,6 +111,89 @@
       // Координаты задаются от центра холста.
       this._ctx.drawImage(this._image, displX, displY);
 
+      //Отрисовка рамки загзагами
+      
+       /**
+       * Отрисовка области кадрирования с границей из точек.
+       */
+      var dotSize = 6; // размер такой же, как у прежней штрихованной рамки
+      var dotNumber = this._resizeConstraint.side / dotSize / 2;
+      var dotRadius = dotSize / 3;
+      this._ctx.fillStyle = '#ffe753';
+
+      for (var i = 0; i < dotNumber; i++) {
+      // В цикле рисуем 4 стороны квадрата с круглой обводкой
+        this._ctx.beginPath();
+        this._ctx.arc(
+          (-this._resizeConstraint.side / 2) - dotRadius + dotSize * (i + 0.5) * 2,
+          (-this._resizeConstraint.side / 2) - dotRadius + dotSize,
+          dotRadius,
+          0,
+          Math.PI * 2
+        );
+        this._ctx.fill();
+
+        this._ctx.beginPath();
+        this._ctx.arc(
+          this._resizeConstraint.side / 2 - dotSize,
+          (-this._resizeConstraint.side / 2) - dotRadius + dotSize * (i+0.5) * 2,
+          dotRadius,
+          0,
+          Math.PI * 2
+        );
+        this._ctx.fill();
+
+        this._ctx.beginPath();
+        this._ctx.arc(
+          this._resizeConstraint.side / 2 - dotSize - dotSize * i * 2,
+          this._resizeConstraint.side / 2 - dotSize,
+          dotRadius,
+          0,
+          Math.PI * 2
+        );
+        this._ctx.fill();
+
+        this._ctx.beginPath();
+        this._ctx.arc(
+          (-this._resizeConstraint.side / 2) - dotRadius + dotSize,
+          this._resizeConstraint.side / 2 - dotSize * i * 2 - dotSize,
+          dotRadius,
+          0,
+          Math.PI * 2
+        );
+        this._ctx.fill();
+      }
+
+      //Отрисовка затемненной области
+      this._ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+      this._ctx.beginPath();
+
+      //внутренняя часть
+      this._ctx.rect( this._resizeConstraint.side / 2 - this._ctx.lineWidth / 2,
+                      this._resizeConstraint.side / 2 - this._ctx.lineWidth / 2,
+                      -this._resizeConstraint.side - this._ctx.lineWidth / 2,
+                      -this._resizeConstraint.side - this._ctx.lineWidth / 2);
+      //внешняя часть
+      this._ctx.rect(this._container.width / 2,
+                    -this._container.height / 2,
+                    -this._container.width,
+                     this._container.height);
+      
+      this._ctx.closePath();
+      this._ctx.fill();
+
+      //вывод размера изображения
+
+      this._ctx.textAlign = 'center';
+      this._ctx.textBaseline = 'bottom';
+      this._ctx.font = '18px Arial';
+      this._ctx.fillStyle = 'white'
+      this._ctx.fillText(this._image.naturalHeight + ' \u00D7 ' + this._image.naturalWidth, 
+        0, 
+        (-this._resizeConstraint.side / 2) - this._ctx.lineWidth);
+
+
+
       // Отрисовка прямоугольника, обозначающего область изображения после
       // кадрирования. Координаты задаются от центра.
       this._ctx.strokeRect(
@@ -118,6 +201,7 @@
           (-this._resizeConstraint.side / 2) - this._ctx.lineWidth / 2,
           this._resizeConstraint.side - this._ctx.lineWidth / 2,
           this._resizeConstraint.side - this._ctx.lineWidth / 2);
+
 
       // Восстановление состояния канваса, которое было до вызова ctx.save
       // и последующего изменения системы координат. Нужно для того, чтобы
@@ -286,6 +370,29 @@
 
       return imageToExport;
     }
+    //Рисуем зигзаг. Входные параметры: координаты начальной позиции,
+    //направление, длина, шаг.
+    //возращает координаты окончания зигзага
+    /*lineToZigzag : function (x, y, direction, length, step) {
+      var zigzagX = x;
+      var zigzagY = y;
+
+      this._ctx.beginPath();
+      this._ctx.moveTo(zigzagX, zigzagY);
+      var zigZagCount = 0;
+      var tmpA, tmpB, moveStep, startA;
+      if((direction == 'right') || (direction == 'left')) {
+        tmpA = zigzagX;
+        startA = zigzagX;
+        tmpB = zigzagY;
+      } else {
+        tmpA = zigzagY;
+        startA = zigzagY;
+        tmpB = zigzagX;
+      }
+
+      if ()
+    }*/
   };
 
   /**

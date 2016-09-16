@@ -3,8 +3,7 @@
 [![Build status][travis-image]][travis-url]
 [![Dependency status][dependency-image]][dependency-url]
 
-* Студент: [Дима Ковалёв](https://htmlacademy.ru/profile/id38378).
-* Наставник: `Unknown`.
+
 
 ### Немного о себе
 
