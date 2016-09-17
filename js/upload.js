@@ -35,6 +35,9 @@
    */
   var filterMap;
 
+  var filterCookie;
+  
+
   /**
    * Объект, который занимается кадрированием изображения.
    * @type {Resizer}
@@ -68,14 +71,6 @@
   }
 
   /**
-   * Проверяет, валидны ли данные, в форме кадрирования.
-   * @return {boolean}
-   */
-  function resizeFormIsValid() {
-    return true;
-  }
-
-  /**
    * Форма загрузки изображения.
    * @type {HTMLFormElement}
    */
@@ -86,6 +81,8 @@
    * @type {HTMLFormElement}
    */
   var resizeForm = document.forms['upload-resize'];
+
+
 
   /**
    * Форма добавления фильтра.
@@ -103,6 +100,46 @@
    */
   var uploadMessage = document.querySelector('.upload-message');
 
+
+  var resizeX = resizeForm['resize-x'];
+  var resizeY = resizeForm['resize-y'];
+  var resizeSize = resizeForm['resize-size'];
+  var resizeFwd = resizeForm['resize-fwd'];
+  var error = document.querySelector('.error');
+
+
+  /**
+   * Проверяет, валидны ли данные, в форме кадрирования.
+   * @return {boolean}
+   */
+  function resizeFormIsValid() {
+
+      if((+resizeX.value + +resizeSize.value) > currentResizer._image.naturalWidth ||
+        (+resizeX.value + +resizeSize.value) > currentResizer._image.naturalHeight) {
+        resizeFwd.setAttribute('disabled', true);
+        resizeFwd.classList.add('upload-form-controls-fwd--disabled');
+      return false;
+
+    }else {
+          resizeFwd.removeAttribute('disabled');
+          resizeFwd.classList.remove('upload-form-controls-fwd--disabled');
+          return true;
+
+    }
+  }
+   var hours = 24;
+   var minutes = 60;
+   var seconds = 60;
+   var ms = 1000;
+
+  function dayAfterBirthday(birthDay){
+    var oneDay = hours * minutes * seconds * ms; 
+    var today = Date.now();
+    var diffInDay = Math.round(Math.abs(today - birthDay / getTime() / oneDay));
+    return diffInDay;
+  }
+
+  
   /**
    * @param {Action} action
    * @param {string=} message
@@ -171,6 +208,37 @@
     }
   };
 
+  //Функция получения данных из ресайзера загруженного изображения (x, y
+  // и сторона в пикселях) и их записи в  поля формы resizeForm
+  function getResizerData() {
+    var currentResizerData = currentResizer.getConstraint();
+    resizeX.value = Math.floor(currentResizerData.x);
+    resizeY.value = Math.floor(currentResizerData.y);
+    resizeSize.value = Math.floor(currentResizerData.side);
+  }
+
+
+/*
+    Обработчик события 'resizerchange' на объекте window.
+   
+   */
+  window.addEventListener('resizerchange', getResizerData);
+
+  // Для улучшения UX валидируем форму еще и на клавиатурных событиях
+  // (по отпускании кнопки).
+  resizeForm.addEventListener('keyup', resizeFormIsValid);
+
+  /*
+    Синхронизация изменения значений полей resizeForm с габаритами окна кадрирования
+    и валидация формы.
+   */
+
+   resizeForm.onchange = function() {
+    currentResizer.setConstraint(+resizeX.value, +resizeY.value, 
+      resizeSize.value);
+    resizeFormIsValid()
+   };
+
   /**
    * Обработка сброса формы кадрирования. Возвращает в начальное состояние
    * и обновляет фон.
@@ -197,6 +265,13 @@
     if (resizeFormIsValid()) {
       filterImage.src = currentResizer.exportImage().src;
 
+      filterCookie = docCookies.getItem('filter-cookie');
+      filterCookie = filterCookie || 'none';
+      filterImage.className = 'filter-image-preview filter-' + filterCookie;
+
+      document.getElementById('upload-filter-' + filterCookie).checked = true;
+
+
       resizeForm.classList.add('invisible');
       filterForm.classList.remove('invisible');
     }
@@ -220,6 +295,10 @@
    */
   filterForm.onsubmit = function(evt) {
     evt.preventDefault();
+    docCookies.setItem('filter-cookie', selectedFilter,
+                         hours * minutes * seconds * ms 
+                         * dayAfterBirthday(new Date(1994,07,07)), '/');
+
 
     cleanupResizer();
     updateBackground();

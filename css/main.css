@@ -98,6 +98,19 @@ body {
   max-width: 582px;
 }
 
+.error {
+  width  : 100%;
+  padding: 0;
+ 
+  font-size: 80%;
+  color: white;
+  background-color: #900;
+  border-radius: 0 0 5px 5px;
+ 
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
 .filter-chrome {
   -webkit-filter: grayscale(1);
   filter: grayscale(1);
