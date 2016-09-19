@@ -36,7 +36,7 @@
   var filterMap;
 
   var filterCookie;
-  
+
 
   /**
    * Объект, который занимается кадрированием изображения.
@@ -133,13 +133,13 @@
    var ms = 1000;
 
   function dayAfterBirthday(birthDay){
-    var oneDay = hours * minutes * seconds * ms; 
+    var oneDay = hours * minutes * seconds * ms;
     var today = Date.now();
     var diffInDay = Math.round(Math.abs(today - birthDay / getTime() / oneDay));
     return diffInDay;
   }
 
-  
+
   /**
    * @param {Action} action
    * @param {string=} message
@@ -220,7 +220,7 @@
 
 /*
     Обработчик события 'resizerchange' на объекте window.
-   
+
    */
   window.addEventListener('resizerchange', getResizerData);
 
@@ -234,7 +234,7 @@
    */
 
    resizeForm.onchange = function() {
-    currentResizer.setConstraint(+resizeX.value, +resizeY.value, 
+    currentResizer.setConstraint(+resizeX.value, +resizeY.value,
       resizeSize.value);
     resizeFormIsValid()
    };
@@ -296,8 +296,8 @@
   filterForm.onsubmit = function(evt) {
     evt.preventDefault();
     docCookies.setItem('filter-cookie', selectedFilter,
-                         hours * minutes * seconds * ms 
-                         * dayAfterBirthday(new Date(1994,07,07)), '/');
+                         hours * minutes * seconds * ms
+                         * dayAfterBirthday(new Date(1994,7,7)), '/');
 
 
     cleanupResizer();
