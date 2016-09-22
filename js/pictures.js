@@ -8,6 +8,11 @@
   var picturesArr = [];
   var activeFilter = 'filter-popular';
   var template = document.querySelector('#picture-template');
+  var currentPage = 0;
+  var PAGE_SIZE = 12;
+  var filteredPictures = [];
+
+
 
   filterForm.classList.add('hidden');
   //put a filter and sort on click
@@ -18,16 +23,51 @@
     };
   }
 
+
+  var scrollTimeout;
+
+  window.addEventListener('scroll', function(evt) {
+    clearTimeout (scrollTimeout);
+    scrollTimeout = setTimeout(function() {
+      console.log('scroll');
+
+    //Как определить что скролл внизу страницы и пора показывать
+    //следующую порцию картинок?
+    //проверить - виден ли футер страницы.
+    //1. определить положение футера относительно экрана (вьюпорта)
+    var footerCoordinates = document.querySelector('.pictures').getBoundingClientRect();
+
+    //2.определить высоту экрана
+    var viewportSize = window.innerHeight;
+
+    //3. если смещение футера минус высота экрана меньше высоты футера,
+    //футер виден хотябы частично
+    if (footerCoordinates.bottom - window.innerHeight <= footerCoordinates.height + window.scrollY) {
+      if (currentPage < Math.ceil(filteredPictures.length / PAGE_SIZE)) {
+        showPictures( filteredPictures,++currentPage);
+        }
+
+    }
+  }, 100);
+  });
+
   //load pictures fron AJAX
   getPictures();
 
   // iterate the items is the data structure
   //to spped up the render using Fragment
-  function showPictures(picturesToRender) {
-    divPictures.innerHTML = '';
+  function showPictures(picturesToRender, pageNumber, replace) {
+    if (replace) {
+      divPictures.innerHTML = '';
+      }
+
     var fragment = document.createDocumentFragment();
 
-    picturesToRender.forEach(function(picture){
+    var from = pageNumber * PAGE_SIZE;
+    var to = from + PAGE_SIZE;
+    var pagePictures = picturesToRender.slice(from, to);
+
+    pagePictures.forEach(function(picture){
       var element = getFromTemplate(picture);
       fragment.appendChild(element);
     });
@@ -43,7 +83,7 @@
     }
 
     //copy array
-    var filteredPictures = picturesArr.slice(0);
+    filteredPictures = picturesArr.slice(0);
 
     switch (id) {
       case ('filter-new'):
@@ -69,7 +109,7 @@
         });
         break;
     }
-    showPictures(filteredPictures);
+    showPictures(filteredPictures, 0, true);
     activeFilter = id;
   }
 
