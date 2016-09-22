@@ -4,7 +4,7 @@
 (function() {
   var divPictures = document.querySelector('.pictures');
   var filterForm = document.querySelector('.filters')
-  var filters = document.querySelectorAll('.filters-radio');
+  var filters = document.querySelector('.filters-radio');
   var picturesArr = [];
   var activeFilter = 'filter-popular';
   var template = document.querySelector('#picture-template');
@@ -16,12 +16,13 @@
 
   filterForm.classList.add('hidden');
   //put a filter and sort on click
-  for (var i = 0; i < filters.length; i++) {
-    filters[i].onclick = function(evt) {
-      var clickedElementID = evt.target.id;
-      setActiveFilter(clickedElementID);
-    };
-  }
+  filterForm.addEventListener('click', function(event) {
+    var clickedElement = event.target;
+    if(clickedElement.classList.contains('filters-radio')) {
+      setActiveFilter(clickedElement.id);
+    }
+  });
+
 
 
   var scrollTimeout;
@@ -29,7 +30,7 @@
   window.addEventListener('scroll', function(evt) {
     clearTimeout (scrollTimeout);
     scrollTimeout = setTimeout(function() {
-      console.log('scroll');
+
 
     //Как определить что скролл внизу страницы и пора показывать
     //следующую порцию картинок?
