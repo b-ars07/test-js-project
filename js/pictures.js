@@ -45,11 +45,11 @@
     //футер виден хотябы частично
     if (footerCoordinates.bottom - window.innerHeight <= footerCoordinates.height + window.scrollY) {
       if (currentPage < Math.ceil(filteredPictures.length / PAGE_SIZE)) {
-        showPictures( filteredPictures,++currentPage);
+        showPictures( filteredPictures, ++currentPage);
         }
 
     }
-  }, 100);
+  }, 300);
   });
 
   //load pictures fron AJAX
@@ -64,9 +64,9 @@
 
     var fragment = document.createDocumentFragment();
 
-    var from = pageNumber * PAGE_SIZE;
-    var to = from + PAGE_SIZE;
-    var pagePictures = picturesToRender.slice(from, to);
+    var pageStart = pageNumber * PAGE_SIZE;
+    var pageEnd = pageStart + PAGE_SIZE;
+    var pagePictures = picturesToRender.slice(pageStart, pageEnd);
 
     pagePictures.forEach(function(picture){
       var element = getFromTemplate(picture);
@@ -86,10 +86,16 @@
     //copy array
     filteredPictures = picturesArr.slice(0);
 
+    var daysInMonth = 30;
+    var hours = 24;
+    var minutes = 60;
+    var seconds = 60;
+    var ms = 1000;
+
     switch (id) {
       case ('filter-new'):
         // 3 month ago (~90 days)
-        var threeMonthsAgo = parseInt(Date.now()) - 90 * 24 * 60 * 60 * 1000;
+        var threeMonthsAgo = parseInt(Date.now()) - daysInMonth * 3 * hours * minutes * seconds * ms;
 
         filteredPictures = filteredPictures.filter(function(item) {
           return Date.now(item.date) > threeMonthsAgo;

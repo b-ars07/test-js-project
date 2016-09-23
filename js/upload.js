@@ -43,7 +43,7 @@
    * @type {Resizer}
    */
   var currentResizer;
-
+  var DECIMAL = 10;
   /**
    * Удаляет текущий объект {@link Resizer}, чтобы создать новый с другим
    * изображением.
@@ -54,6 +54,34 @@
       currentResizer = null;
     }
   }
+    window.addEventListener('resizerchange', resizerChangeHandler);
+
+     function resizerChangeHandler() {
+
+       if(currentResizer) {
+         if(currentResizer.getConstraint().x < 0){
+           currentResizer.setConstraint(0);
+         }
+
+         if(currentResizer.getConstraint().x > currentResizer._image.naturalWidth - currentResizer.getConstraint().side) {
+           currentResizer.setConstraint(currentResizer._image.naturalWidth - currentResizer.getConstraint().side);
+         }
+
+         if(currentResizer.getConstraint().y < 0) {
+           currentResizer.setConstraint(currentResizer.getConstraint().x, 0);
+         }
+
+         if(currentResizer.getConstraint().y > currentResizer._image.naturalHeight - currentResizer.getConstraint().side){
+           currentResizer.setConstraint(currentResizer.getConstraint().x, currentResizer._image.naturalHeight - currentResizer.getConstraint().side);
+         }
+
+
+
+      resizeForm['resize-x'].value = parseInt(currentResizer.getConstraint().x, DECIMAL);
+      resizeForm['resize-y'].value = parseInt(currentResizer.getConstraint().y, DECIMAL);
+      resizeForm['resize-size'].value = parseInt(currentResizer.getConstraint().side, DECIMAL);
+      }
+    }
 
   /**
    * Ставит одну из трех случайных картинок на фон формы загрузки.
@@ -104,7 +132,7 @@
   var resizeX = resizeForm['resize-x'];
   var resizeY = resizeForm['resize-y'];
   var resizeSize = resizeForm['resize-size'];
-  var resizeFwd = resizeForm['resize-fwd'];
+  var resizeButton = resizeForm['resize-fwd'];
   var error = document.querySelector('.error');
 
 
@@ -114,15 +142,15 @@
    */
   function resizeFormIsValid() {
 
-      if((+resizeX.value + +resizeSize.value) > currentResizer._image.naturalWidth ||
-        (+resizeX.value + +resizeSize.value) > currentResizer._image.naturalHeight) {
-        resizeFwd.setAttribute('disabled', true);
-        resizeFwd.classList.add('upload-form-controls-fwd--disabled');
+      if((parseInt(resizeX.value) + parseInt(resizeSize.value)) > currentResizer._image.naturalWidth ||
+        (parseInt(resizeX.value) + parseInt(resizeSize.value)) > currentResizer._image.naturalHeight) {
+        resizeButton.setAttribute('disabled', true);
+        resizeButton.classList.add('upload-form-controls-fwd--disabled');
       return false;
 
     }else {
-          resizeFwd.removeAttribute('disabled');
-          resizeFwd.classList.remove('upload-form-controls-fwd--disabled');
+          resizeButton.removeAttribute('disabled');
+          resizeButton.classList.remove('upload-form-controls-fwd--disabled');
           return true;
 
     }
@@ -137,6 +165,62 @@
     var today = Date.now();
     var diffInDay = Math.round(Math.abs(today - birthDay / getTime() / oneDay));
     return diffInDay;
+  }
+
+
+  uploadForm.addEventListener('change', function(event) {
+    resizeFormChangeHandler(event.target);
+
+      currentResize.redraw();
+    });
+
+  function resizeFormChangeHandler(target) {
+    var element = target;
+    if(element.name === 'x')
+    {
+      if(parseInt(element.value) <= 0){
+        element.value = 0;
+        currentResizer.setConstraint(parseInt(element.value));
+      }
+      else if(parseInt(element.value) + currentResizer.getConstraint().side <= currentResizer._image.naturalWidth) {
+        currentResizer.setConstraint(parseInt(element.value));
+      }
+      else {
+        element.value = currentResizer._image.naturalWidth - currentResizer.getConstraint().side;
+        currentResizer.setConstraint(parseInt(element.value));
+      }
+    }
+
+    if(element.name === 'y') {
+      if(parseInt(element.value <= 0)){
+        element.value = 0;
+        currentResizer.setConstraint(parseInt(resizeForm['resize-x'].value), parseInt(resizeForm['resize-y'].value), parseInt(element.value));
+      }
+      else if(parseInt(element.value) + currentResizer.getConstraint().side <= currentResizer._image.naturalHeight) {
+        currentResizer.setConstraint(parseInt(resizeForm['resize-x'].value), parseInt(element.value));
+      }
+      else {
+        element.value = currentResizer._image.naturalHeight - currentResize.getConstraint().side;
+        currentResize.setConstraint(parseInt(resizeForm['resize-x'].value), parseInt(element.value));
+      }
+    }
+
+    if(element.name === 'size'){
+      if(element.value <= 0){
+        element.value = 0;
+        currentResize.setConstraint(parseInt(resizeForm['resize-x'].value), parseInt(resizeForm['resize-y'].value), parseInt(element.value));
+      }
+      else if(element.value <+ Math.min(currentResize._image.naturalWidth - resizeForm['resize-x'].value,
+                                       currentResize._image.naturalHeight - resizeForm['resize-y'].value)) {
+        currentResize.setConstraint(parseInt(resizeForm['resize-x'].value), parseInt(resizeForm['resize-y'].value), parseInt(element.value));
+      }
+      else {
+        element.value = Math.min(currentResize._image.naturalWidth - resizeForm['resize-x'].value,
+                                 currentResize._image.naturalHeight - resizeForm['resize-y'].value);
+        currentResize.setConstraint(parseInt(resizeForm['resize-x'].value), parseInt(resizeForm['resize-y'].value), parseInt(element.value));
+      }
+    }
+
   }
 
 
@@ -176,7 +260,7 @@
    * и показывается форма кадрирования.
    * @param {Event} evt
    */
-  uploadForm.onchange = function(evt) {
+  uploadForm.addEventListener('change', function(evt) {
     var element = evt.target;
     if (element.id === 'upload-file') {
       // Проверка типа загружаемого файла, тип должен быть изображением
@@ -186,7 +270,7 @@
 
         showMessage(Action.UPLOADING);
 
-        fileReader.onload = function() {
+        fileReader.addEventListener('load', function() {
           cleanupResizer();
 
           currentResizer = new Resizer(fileReader.result);
@@ -196,19 +280,19 @@
           uploadForm.classList.add('invisible');
           resizeForm.classList.remove('invisible');
 
-          hideMessage();
-        };
-
+        });
+        hideMessage();
+      }
         fileReader.readAsDataURL(element.files[0]);
       } else {
         // Показ сообщения об ошибке, если загружаемый файл, не является
         // поддерживаемым изображением.
         showMessage(Action.ERROR);
       }
-    }
-  };
 
-  //Функция получения данных из ресайзера загруженного изображения (x, y
+  });
+
+  // Функция получения данных из ресайзера загруженного изображения (x, y
   // и сторона в пикселях) и их записи в  поля формы resizeForm
   function getResizerData() {
     var currentResizerData = currentResizer.getConstraint();
@@ -218,33 +302,33 @@
   }
 
 
-/*
-    Обработчик события 'resizerchange' на объекте window.
+  // /*
+    //   Обработчик события 'resizerchange' на объекте window.
+    //
+    //  */
+    window.addEventListener('resizerchange', getResizerData);
 
-   */
-  window.addEventListener('resizerchange', getResizerData);
-
-  // Для улучшения UX валидируем форму еще и на клавиатурных событиях
-  // (по отпускании кнопки).
-  resizeForm.addEventListener('keyup', resizeFormIsValid);
+    // Для улучшения UX валидируем форму еще и на клавиатурных событиях
+    // (по отпускании кнопки).
+    resizeForm.addEventListener('keyup', resizeFormIsValid);
 
   /*
     Синхронизация изменения значений полей resizeForm с габаритами окна кадрирования
     и валидация формы.
    */
 
-   resizeForm.onchange = function() {
-    currentResizer.setConstraint(+resizeX.value, +resizeY.value,
-      resizeSize.value);
+   resizeForm.addEventListener('change', function() {
+    currentResizer.setConstraint(parseInt(resizeX.value), parseInt(resizeY.value),
+      parseInt(resizeSize.value));
     resizeFormIsValid()
-   };
+  });
 
   /**
    * Обработка сброса формы кадрирования. Возвращает в начальное состояние
    * и обновляет фон.
    * @param {Event} evt
    */
-  resizeForm.onreset = function(evt) {
+  resizeForm.addEventListener('reset', function(evt) {
     evt.preventDefault();
 
     cleanupResizer();
@@ -252,14 +336,14 @@
 
     resizeForm.classList.add('invisible');
     uploadForm.classList.remove('invisible');
-  };
+  });
 
   /**
    * Обработка отправки формы кадрирования. Если форма валидна, экспортирует
    * кропнутое изображение в форму добавления фильтра и показывает ее.
    * @param {Event} evt
    */
-  resizeForm.onsubmit = function(evt) {
+  resizeForm.addEventListener('submit', function(evt) {
     evt.preventDefault();
 
     if (resizeFormIsValid()) {
@@ -275,25 +359,25 @@
       resizeForm.classList.add('invisible');
       filterForm.classList.remove('invisible');
     }
-  };
+  });
 
   /**
    * Сброс формы фильтра. Показывает форму кадрирования.
    * @param {Event} evt
    */
-  filterForm.onreset = function(evt) {
+  filterForm.addEventListener('reset', function(evt) {
     evt.preventDefault();
 
     filterForm.classList.add('invisible');
     resizeForm.classList.remove('invisible');
-  };
+  });
 
   /**
    * Отправка формы фильтра. Возвращает в начальное состояние, предварительно
    * записав сохраненный фильтр в cookie.
    * @param {Event} evt
    */
-  filterForm.onsubmit = function(evt) {
+  filterForm.addEventListener('submit', function(evt) {
     evt.preventDefault();
     docCookies.setItem('filter-cookie', selectedFilter,
                          hours * minutes * seconds * ms
@@ -305,13 +389,13 @@
 
     filterForm.classList.add('invisible');
     uploadForm.classList.remove('invisible');
-  };
+  });
 
   /**
    * Обработчик изменения фильтра. Добавляет класс из filterMap соответствующий
    * выбранному значению в форме.
    */
-  filterForm.onchange = function() {
+  filterForm.addEventListener('change', function() {
     if (!filterMap) {
       // Ленивая инициализация. Объект не создается до тех пор, пока
       // не понадобится прочитать его в первый раз, а после этого запоминается
@@ -331,7 +415,7 @@
     // убрать предыдущий примененный класс. Для этого нужно или запоминать его
     // состояние или просто перезаписывать.
     filterImage.className = 'filter-image-preview ' + filterMap[selectedFilter];
-  };
+  });
 
   cleanupResizer();
   updateBackground();
