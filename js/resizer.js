@@ -1,3 +1,9 @@
+/**
+ * @fileOverview Обработчики загрузки изображений, кадрирования, обрезки,
+ * установки фильтра, сохранения последнего выбранного фильтра в куки.
+ *
+ */
+
 'use strict';
 
 (function() {
@@ -6,7 +12,7 @@
    * @param {FileBuffer}
    */
   var Resizer = function(image) {
-    // Изображение, с которым будет вестись работа.
+    /** @type {Image} */
     this._image = new Image();
     this._image.src = image;
 
@@ -77,6 +83,7 @@
 
     /**
      * Отрисовка канваса.
+     @author Arseniy Berezin
      */
     redraw: function() {
       // Очистка изображения.
@@ -113,8 +120,8 @@
 
 
       /**
-    //  * Отрисовка области кадрирования с границей из точек.
-    //  */
+      * Отрисовка области кадрирования с границей из точек.
+      */
   // var dotSize = 6; // размер такой же, как у прежней штрихованной рамки
   // var dotNumber = this._resizeConstraint.side / dotSize / 2;
   // var dotRadius = dotSize / 2;
@@ -372,26 +379,6 @@
     //Рисуем зигзаг. Входные параметры: координаты начальной позиции,
     //направление, длина, шаг.
     //возращает координаты окончания зигзага
-    /*lineToZigzag : function (x, y, direction, length, step) {
-      var zigzagX = x;
-      var zigzagY = y;
-
-      this._ctx.beginPath();
-      this._ctx.moveTo(zigzagX, zigzagY);
-      var zigZagCount = 0;
-      var tmpA, tmpB, moveStep, startA;
-      if((direction == 'right') || (direction == 'left')) {
-        tmpA = zigzagX;
-        startA = zigzagX;
-        tmpB = zigzagY;
-      } else {
-        tmpA = zigzagY;
-        startA = zigzagY;
-        tmpB = zigzagX;
-      }
-
-      if ()
-    }*/
   };
 
   /**

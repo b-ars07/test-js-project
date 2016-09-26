@@ -1,24 +1,42 @@
 /*global Photo: true, Gallery: true*/
 
+/**
+* @fileOverview Модуль выгрузки картинок из JSON файла (data/pictures.json)
+* обработки данных и вывода на страницу с использованием шаблона. Фильтрация картинок.
+* Обработчик кликов по фотографиям, показывающим галерею
+* @author Arseniy Berezin
+*/
+
 'use strict';
 
 
 (function() {
+  /** var {HTMLElement} */
   var divPictures = document.querySelector('.pictures');
+  /** var {HTMLElement} */
   var filterForm = document.querySelector('.filters')
+  /** var {HTMLElement} */
   var filters = document.querySelector('.filters-radio');
+  /** var {Array.<string>} */
   var picturesArr = [];
+  /** var {string} */
   var activeFilter = 'filter-popular';
+  /** var {number} */
   var currentPage = 0;
+  /** @const {number} */
   var PAGE_SIZE = 12;
+  /** @const {number} */
   var SCROLL_TIMEOUT = 100;
+  /** var {Array.<string>} */
   var filteredPictures = [];
+  /** var {Gallery} */
   var gallery = new Gallery();
 
   filterForm.classList.add('hidden');
-  //put a filter and sort on click
-  // Добавляем также функцию addPageOnScroll, иначе по клику на фильтр
-  // на больших разрешениях выводится только 12 фотографий.
+  /**
+  * Добавляем также функцию addPageOnScroll, иначе по клику на фильтр
+  * на больших разрешениях выводится только 12 фотографий.
+  */
   filterForm.addEventListener('click', function(event) {
     var clickedElement = event.target;
     if(clickedElement.classList.contains('filters-radio')) {
@@ -28,7 +46,7 @@
   });
 
 
-
+ /** var {number} */
   var scrollTimeout;
 
   window.addEventListener('scroll', function(evt) {
@@ -36,20 +54,22 @@
     scrollTimeout = setTimeout(addPageOnScroll, SCROLL_TIMEOUT);
   });
 
-  // if 12 картинок помещаются, use ф-ю addPageOnScroll() еще и на событии 'load'
-  // (адаптация для больших разрешений).
+  /** if 12 картинок помещаются, use ф-ю addPageOnScroll() еще и на событии 'load'
+  * (адаптация для больших разрешений). */
   window.addEventListener('load', addPageOnScroll);
 
   function addPageOnScroll() {
-    //Как определить что скролл внизу страницы и пора показывать
-    //следующую порцию картинок?
-    //проверить - виден ли футер страницы.
-    //1. определить положение футера относительно экрана (вьюпорта)
+    /** Как определить что скролл внизу страницы и пора показывать
+    *следующую порцию картинок?
+    *проверить - виден ли футер страницы.
+    *1. определить положение футера относительно экрана (вьюпорта)
+    */
     var picturesCoordinates = document.querySelector('.pictures').getBoundingClientRect();
     var viewportSize = document.documentElement.offsetHeight;
 
-    //3. если смещение высота экрана меньше высоты футера,
-    //футер виден хотябы частично
+    /** 3. если смещение высота экрана меньше высоты футера,
+    *футер виден хотябы частично
+    */
     if (picturesCoordinates.height <= viewportSize + window.scrollY) {
       if (currentPage < Math.ceil(filteredPictures.length / PAGE_SIZE)) {
         showPictures( filteredPictures, ++currentPage);
@@ -57,11 +77,12 @@
     }
   }
 
-  //load pictures fron AJAX
+  /** загружаем картинки с помощью AJAX */
   getPictures();
 
-  // iterate the items is the data structure
-  //to spped up the render using Fragment
+  /** Перебираем элементы в структуре данных, для ускорения отрисовки
+  * используем Fragment
+  */
   function showPictures(picturesToRender, pageNumber, replace) {
     if (replace) {
       var renderElements = document.querySelectorAll('.picture');
@@ -94,14 +115,16 @@
     gallery.show();
   }
 
-  //sort function
+  /** Функция сортировки
+  * @param {string} id
+  * @param {boolean} force
+  */
   function setActiveFilter(id, force) {
     //prevetion on installing one and the same filter
     if (activeFilter === id && !force){
       return;
     }
 
-    //copy array
     filteredPictures = picturesArr.slice(0);
 
     var daysInMonth = 30;
@@ -174,14 +197,14 @@
     xhr.send();
   }
 
-  // Сохранение выгруженного списка в pictures согласно выставленному фильтру.
+  /** Сохранение выгруженного списка в pictures согласно выставленному фильтру.
+  * @param {Object.<string>, string|number} loadedPictures
+  */
   function updateLoadedPictures(loadedPictures) {
     picturesArr = loadedPictures;
 
     setActiveFilter(activeFilter, true);
   }
-
-
 
   filterForm.classList.remove('hidden');
 
