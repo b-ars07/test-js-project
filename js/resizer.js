@@ -112,57 +112,56 @@
       this._ctx.drawImage(this._image, displX, displY);
 
 
-
-      //  /**
-      //  * Отрисовка области кадрирования с границей из точек.
-      //  */
-      // var dotSize = 6; // размер такой же, как у прежней штрихованной рамки
-      // var dotNumber = this._resizeConstraint.side / dotSize / 2;
-      // var dotRadius = dotSize / 3;
-      // this._ctx.fillStyle = '#ffe753';
-      //
-      // for (var i = 0; i < dotNumber; i++) {
-      // // В цикле рисуем 4 стороны квадрата с круглой обводкой
-      //   this._ctx.beginPath();
-      //   this._ctx.arc(
-      //     (-this._resizeConstraint.side / 2) - dotRadius + dotSize * (i + 0.5) * 2,
-      //     (-this._resizeConstraint.side / 2) - dotRadius + dotSize,
-      //     dotRadius,
-      //     0,
-      //     Math.PI * 2
-      //   );
-      //   this._ctx.fill();
-      //
-      //   this._ctx.beginPath();
-      //   this._ctx.arc(
-      //     this._resizeConstraint.side / 2 - dotSize,
-      //     (-this._resizeConstraint.side / 2) - dotRadius + dotSize * (i+0.5) * 2,
-      //     dotRadius,
-      //     0,
-      //     Math.PI * 2
-      //   );
-      //   this._ctx.fill();
-      //
-      //   this._ctx.beginPath();
-      //   this._ctx.arc(
-      //     this._resizeConstraint.side / 2 - dotSize - dotSize * i * 2,
-      //     this._resizeConstraint.side / 2 - dotSize,
-      //     dotRadius,
-      //     0,
-      //     Math.PI * 2
-      //   );
-      //   this._ctx.fill();
-      //
-      //   this._ctx.beginPath();
-      //   this._ctx.arc(
-      //     (-this._resizeConstraint.side / 2) - dotRadius + dotSize,
-      //     this._resizeConstraint.side / 2 - dotSize * i * 2 - dotSize,
-      //     dotRadius,
-      //     0,
-      //     Math.PI * 2
-      //   );
-      //   this._ctx.fill();
-      // }
+      /**
+    //  * Отрисовка области кадрирования с границей из точек.
+    //  */
+  // var dotSize = 6; // размер такой же, как у прежней штрихованной рамки
+  // var dotNumber = this._resizeConstraint.side / dotSize / 2;
+  // var dotRadius = dotSize / 2;
+  // this._ctx.fillStyle = '#ffe753';
+  //
+  // for (var i = 0; i < dotNumber; i++) {
+  // // В цикле рисуем 4 стороны квадрата с круглой обводкой
+  //   this._ctx.beginPath();
+  //   this._ctx.arc(
+  //     (-this._resizeConstraint.side / 2) - dotRadius + dotSize * i * 2,
+  //     (-this._resizeConstraint.side / 2) - dotRadius,
+  //     dotRadius,
+  //     0,
+  //     Math.PI * 2
+  //   );
+  //   this._ctx.fill();
+  //
+  //   this._ctx.beginPath();
+  //   this._ctx.arc(
+  //     this._resizeConstraint.side / 2 - dotSize,
+  //     (-this._resizeConstraint.side / 2) - dotRadius + dotSize * i * 2,
+  //     dotRadius,
+  //     0,
+  //     Math.PI * 2
+  //   );
+  //   this._ctx.fill();
+  //
+  //   this._ctx.beginPath();
+  //   this._ctx.arc(
+  //     this._resizeConstraint.side / 2 - dotSize - dotSize * i * 2,
+  //     this._resizeConstraint.side / 2 - dotSize,
+  //     dotRadius,
+  //     0,
+  //     Math.PI * 2
+  //   );
+  //   this._ctx.fill();
+  //
+  //   this._ctx.beginPath();
+  //   this._ctx.arc(
+  //     (-this._resizeConstraint.side / 2) - dotRadius,
+  //     this._resizeConstraint.side / 2 - dotSize * i * 2 - dotSize,
+  //     dotRadius,
+  //     0,
+  //     Math.PI * 2
+  //   );
+  //   this._ctx.fill();
+  // }
 
       //Отрисовка затемненной области
       this._ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';

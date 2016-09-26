@@ -1,3 +1,5 @@
+/*global Photo: true, Gallery: true*/
+
 'use strict';
 
 
@@ -9,16 +11,19 @@
   var activeFilter = 'filter-popular';
   var currentPage = 0;
   var PAGE_SIZE = 12;
+  var SCROLL_TIMEOUT = 100;
   var filteredPictures = [];
-
-
+  var gallery = new Gallery();
 
   filterForm.classList.add('hidden');
   //put a filter and sort on click
+  // Добавляем также функцию addPageOnScroll, иначе по клику на фильтр
+  // на больших разрешениях выводится только 12 фотографий.
   filterForm.addEventListener('click', function(event) {
     var clickedElement = event.target;
     if(clickedElement.classList.contains('filters-radio')) {
       setActiveFilter(clickedElement.id);
+      addPageOnScroll();
     }
   });
 
@@ -28,28 +33,29 @@
 
   window.addEventListener('scroll', function(evt) {
     clearTimeout (scrollTimeout);
-    scrollTimeout = setTimeout(function() {
+    scrollTimeout = setTimeout(addPageOnScroll, SCROLL_TIMEOUT);
+  });
 
+  // if 12 картинок помещаются, use ф-ю addPageOnScroll() еще и на событии 'load'
+  // (адаптация для больших разрешений).
+  window.addEventListener('load', addPageOnScroll);
 
+  function addPageOnScroll() {
     //Как определить что скролл внизу страницы и пора показывать
     //следующую порцию картинок?
     //проверить - виден ли футер страницы.
     //1. определить положение футера относительно экрана (вьюпорта)
-    var footerCoordinates = document.querySelector('.pictures').getBoundingClientRect();
+    var picturesCoordinates = document.querySelector('.pictures').getBoundingClientRect();
+    var viewportSize = document.documentElement.offsetHeight;
 
-    //2.определить высоту экрана
-    var viewportSize = window.innerHeight;
-
-    //3. если смещение футера минус высота экрана меньше высоты футера,
+    //3. если смещение высота экрана меньше высоты футера,
     //футер виден хотябы частично
-    if (footerCoordinates.bottom - window.innerHeight <= footerCoordinates.height + window.scrollY) {
+    if (picturesCoordinates.height <= viewportSize + window.scrollY) {
       if (currentPage < Math.ceil(filteredPictures.length / PAGE_SIZE)) {
         showPictures( filteredPictures, ++currentPage);
         }
-
     }
-  }, 300);
-  });
+  }
 
   //load pictures fron AJAX
   getPictures();
@@ -58,6 +64,10 @@
   //to spped up the render using Fragment
   function showPictures(picturesToRender, pageNumber, replace) {
     if (replace) {
+      var renderElements = document.querySelectorAll('.picture');
+      [].forEach.call(renderElements, function(el) {
+        divPictures.removeChild(el);
+      });
       divPictures.innerHTML = '';
       }
 
@@ -68,12 +78,20 @@
     var pagePictures = picturesToRender.slice(pageStart, pageEnd);
 
     pagePictures.forEach(function(picture){
-      var element = new Photo(picture);
-      element.render();
-      fragment.appendChild(element.element);
+      var photoElement = new Photo(picture);
+      photoElement.render();
+      fragment.appendChild(photoElement.element);
+
+      //Показ галереи должен происходить по клику на картинку
+      photoElement.element.addEventListener('click', _onPhotoClick);
     });
 
     divPictures.appendChild(fragment);
+  }
+
+  function _onPhotoClick(evt) {
+    evt.preventDefault();
+    gallery.show();
   }
 
   //sort function
@@ -116,7 +134,8 @@
         });
         break;
     }
-    showPictures(filteredPictures, 0, true);
+    currentPage = 0;
+    showPictures(filteredPictures, currentPage, true);
     activeFilter = id;
   }
 
