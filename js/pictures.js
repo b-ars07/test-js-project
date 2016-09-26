@@ -7,7 +7,6 @@
   var filters = document.querySelector('.filters-radio');
   var picturesArr = [];
   var activeFilter = 'filter-popular';
-  var template = document.querySelector('#picture-template');
   var currentPage = 0;
   var PAGE_SIZE = 12;
   var filteredPictures = [];
@@ -69,8 +68,9 @@
     var pagePictures = picturesToRender.slice(pageStart, pageEnd);
 
     pagePictures.forEach(function(picture){
-      var element = getFromTemplate(picture);
-      fragment.appendChild(element);
+      var element = new Photo(picture);
+      element.render();
+      fragment.appendChild(element.element);
     });
 
     divPictures.appendChild(fragment);
@@ -162,50 +162,7 @@
     setActiveFilter(activeFilter, true);
   }
 
-    //новый экземпляр по шаблону
-    function getFromTemplate(data) {
-         var IMAGE_TIMEOUT = 10000;
-         var element = template.content.children[0].cloneNode(true);
 
-
-         // Вывод количества лайков и комментариев:
-         element.querySelector('.picture-comments').textContent = data.comments;
-         element.querySelector('.picture-likes').textContent = data.likes;
-
-         // Объявляем переменные картинок: первая - заменяемый тэг в шаблоне,
-         // вторая - загружаемое с сервера изображение.
-         var currentImg = element.querySelector('img');
-         var image = new Image(182, 182);
-
-         // До загрузки картинки будет отображаться иконка-спиннер.
-         element.classList.add('picture-load-process');
-
-         var showLoadingError = function() {
-           image.src = '';
-           element.classList.remove('picture-load-process');
-           element.classList.add('picture-load-failure');
-           element.href = '#';
-         };
-
-         // Установка таймаута на загрузку изображения.
-         var imageLoadTimeout = setTimeout(showLoadingError, IMAGE_TIMEOUT);
-
-         // Отмена таймаута при загрузке и замена картинок.
-         image.onload = function() {
-           clearTimeout(imageLoadTimeout);
-           element.classList.remove('picture-load-process');
-           element.replaceChild(image, currentImg);
-           element.href = image.src;
-         };
-
-         // Обработка ошибки сервера
-         image.onerror = showLoadingError;
-
-         // Изменение src у изображения начинает загрузку.
-         image.src = data.url;
-
-         return element;
-       }
 
   filterForm.classList.remove('hidden');
 
