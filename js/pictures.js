@@ -11,25 +11,27 @@
 
 
 (function() {
-  /** var {HTMLElement} */
+  /** @type {HTMLElement} */
   var divPictures = document.querySelector('.pictures');
-  /** var {HTMLElement} */
+  /** @type {HTMLElement} */
   var filterForm = document.querySelector('.filters')
-  /** var {HTMLElement} */
+  /** @type {HTMLElement} */
   var filters = document.querySelector('.filters-radio');
-  /** var {Array.<string>} */
+  /** @type {Array.<string>} */
   var picturesArr = [];
-  /** var {string} */
+  /** @type {string} */
   var activeFilter = 'filter-popular';
-  /** var {number} */
+  /** @type {number} */
   var currentPage = 0;
   /** @const {number} */
   var PAGE_SIZE = 12;
   /** @const {number} */
   var SCROLL_TIMEOUT = 100;
-  /** var {Array.<string>} */
+  /** @type {Array.<string>} */
   var filteredPictures = [];
-  /** var {Gallery} */
+  /** @type {Array.<string>} */
+  var renderedElements = [];
+  /** @type {Gallery} */
   var gallery = new Gallery();
 
   filterForm.classList.add('hidden');
@@ -85,12 +87,13 @@
   */
   function showPictures(picturesToRender, pageNumber, replace) {
     if (replace) {
-      var renderElements = document.querySelectorAll('.picture');
-      [].forEach.call(renderElements, function(el) {
-        divPictures.removeChild(el);
-      });
-      divPictures.innerHTML = '';
+      var el;
+      while ((el = renderedElements.shift())) {
+        divPictures.removeChild(el.element);
+        el.onClick = null;
+        el.remove();
       }
+    }
 
     var fragment = document.createDocumentFragment();
 
@@ -98,21 +101,21 @@
     var pageEnd = pageStart + PAGE_SIZE;
     var pagePictures = picturesToRender.slice(pageStart, pageEnd);
 
-    pagePictures.forEach(function(picture){
+    renderedElements = renderedElements.concat(pagePictures.map(function(picture, index){
       var photoElement = new Photo(picture);
       photoElement.render();
       fragment.appendChild(photoElement.element);
 
       //Показ галереи должен происходить по клику на картинку
-      photoElement.element.addEventListener('click', _onPhotoClick);
-    });
+      photoElement.onClick = function() {
+        gallery.data = photoElement._data;
+        gallery.setCurrentPicture(index);
+        gallery.show();
+      };
+      return photoElement;
+    }));
 
     divPictures.appendChild(fragment);
-  }
-
-  function _onPhotoClick(evt) {
-    evt.preventDefault();
-    gallery.show();
   }
 
   /** Функция сортировки
@@ -157,6 +160,8 @@
         });
         break;
     }
+
+    gallery.setPictures(filteredPictures);
     currentPage = 0;
     showPictures(filteredPictures, currentPage, true);
     activeFilter = id;

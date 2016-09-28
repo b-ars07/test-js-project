@@ -12,7 +12,17 @@
   */
   function Photo(data) {
     this._data = data;
+
+    this._onPhotoClick = function(evt) {
+      evt.preventDefault();
+      if (!this.element.classList.contains('picture-load-failure')) {
+        if(typeof  this.onClick === 'function') {
+          this.onClick();
+        }
+      }
+    }.bind(this);
   }
+  
   /**новый экземпляр по шаблону*/
   Photo.prototype.render = function() {
          /** @const {number} */
@@ -57,7 +67,24 @@
          image.onerror = showLoadingError;
          /** Изменение src у изображения начинает загрузку. */
          image.src = this._data.url;
+
+          this.element.addEventListener('click', this._onPhotoClick)
+
        };
+
+  /** @type {?Function} */
+       Photo.prototype.onClick = null;
+
+        //Удаление обработчика клика по фотографии
+       Photo.prototype.remove = function() {
+         this.element.removeEventListener('click', this._onPhotoClick);
+       }
+
+
+       /**
+       * @type {?Function}
+       */
+       Photo.prototype.onClick = null;
 
        window.Photo = Photo;
    })();
