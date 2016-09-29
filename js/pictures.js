@@ -20,7 +20,7 @@
   /** @type {Array.<string>} */
   var picturesArr = [];
   /** @type {string} */
-  var activeFilter = 'filter-popular';
+  var activeFilter = localStorage.getItem('activeFilter') || 'filter-popular';
   /** @type {number} */
   var currentPage = 0;
   /** @const {number} */
@@ -51,26 +51,30 @@
  /** var {number} */
   var scrollTimeout;
 
+  /**
+   * обработчик события scroll
+   */
   window.addEventListener('scroll', function(evt) {
     clearTimeout (scrollTimeout);
     scrollTimeout = setTimeout(addPageOnScroll, SCROLL_TIMEOUT);
   });
 
-  /** if 12 картинок помещаются, use ф-ю addPageOnScroll() еще и на событии 'load'
+  /** если 12 картинок помещаются, используем ф-ю addPageOnScroll() еще и на событии 'load'
   * (адаптация для больших разрешений). */
   window.addEventListener('load', addPageOnScroll);
+
 
   function addPageOnScroll() {
     /** Как определить что скролл внизу страницы и пора показывать
     *следующую порцию картинок?
     *проверить - виден ли футер страницы.
-    *1. определить положение футера относительно экрана (вьюпорта)
+    *1. определить положение конца страницы относительно экрана (вьюпорта)
     */
     var picturesCoordinates = document.querySelector('.pictures').getBoundingClientRect();
     var viewportSize = document.documentElement.offsetHeight;
 
-    /** 3. если смещение высота экрана меньше высоты футера,
-    *футер виден хотябы частично
+    /** 2. если смещение высота экрана меньше высоты конца страницы,
+    * конец виден хотябы частично
     */
     if (picturesCoordinates.height <= viewportSize + window.scrollY) {
       if (currentPage < Math.ceil(filteredPictures.length / PAGE_SIZE)) {
@@ -101,16 +105,18 @@
     var pageEnd = pageStart + PAGE_SIZE;
     var pagePictures = picturesToRender.slice(pageStart, pageEnd);
 
-    renderedElements = renderedElements.concat(pagePictures.map(function(picture, index){
+    renderedElements = renderedElements.concat(pagePictures.map(function(picture){
       var photoElement = new Photo(picture);
       photoElement.render();
       fragment.appendChild(photoElement.element);
 
       //Показ галереи должен происходить по клику на картинку
+      // Обработчик взаимодействия с фотографией теперь работает с адресной
+      // строкой, куда он передает обрезанную часть пути src, начиная с "photos"
       photoElement.onClick = function() {
-        gallery.data = photoElement._data;
-        gallery.setCurrentPicture(index);
-        gallery.show();
+        var hashToAdd = photoElement.image.src;
+        location.hash = 'photo/' + hashToAdd.substr(hashToAdd.indexOf('photos'));
+        gallery._onHashChange();
       };
       return photoElement;
     }));
@@ -165,10 +171,14 @@
     currentPage = 0;
     showPictures(filteredPictures, currentPage, true);
     activeFilter = id;
+    //запись фильтра в localStorage
+    localStorage.setItem('activeFilter', id);
+    filterForm[activeFilter].checked = true;
   }
 
-
-  //AJAX upload function for data from pictures.json
+  /**
+   * //AJAX upload function for data from pictures.json
+   */
   function getPictures() {
     var xhr = new XMLHttpRequest();
     xhr.timeout = 10000;

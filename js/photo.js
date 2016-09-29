@@ -13,6 +13,9 @@
   function Photo(data) {
     this._data = data;
 
+    /** @member {HTMLElement} template */
+    Photo.prototype.template = document.querySelector('#picture-template');
+
     this._onPhotoClick = function(evt) {
       evt.preventDefault();
       if (!this.element.classList.contains('picture-load-failure')) {
@@ -22,7 +25,7 @@
       }
     }.bind(this);
   }
-  
+
   /**новый экземпляр по шаблону*/
   Photo.prototype.render = function() {
          /** @const {number} */
@@ -41,13 +44,13 @@
          * @type {Image} image
          */
          var currentImg = this.element.querySelector('img');
-         var image = new Image(182, 182);
+        this.image = new Image(182, 182);
 
          /** До загрузки картинки будет отображаться иконка-спиннер. */
          this.element.classList.add('picture-load-process');
 
          var showLoadingError = function() {
-           image.src = '';
+           this.image.src = '';
            this.element.classList.remove('picture-load-process');
            this.element.classList.add('picture-load-failure');
            this.element.href = '#';
@@ -57,16 +60,16 @@
          var imageLoadTimeout = setTimeout(showLoadingError, IMAGE_TIMEOUT);
 
          /** Отмена таймаута при загрузке и замена картинок. */
-         image.onload = function() {
+         this.image.onload = function() {
            clearTimeout(imageLoadTimeout);
            this.element.classList.remove('picture-load-process');
-           this.element.replaceChild(image, currentImg);
-           this.element.href = image.src;
+           this.element.replaceChild(this.image, currentImg);
+           this.element.href = this.image.src;
          }.bind(this);
          /**  Обработка ошибки сервера */
-         image.onerror = showLoadingError;
+         this.image.onerror = showLoadingError;
          /** Изменение src у изображения начинает загрузку. */
-         image.src = this._data.url;
+         this.image.src = this._data.url;
 
           this.element.addEventListener('click', this._onPhotoClick)
 
@@ -78,13 +81,7 @@
         //Удаление обработчика клика по фотографии
        Photo.prototype.remove = function() {
          this.element.removeEventListener('click', this._onPhotoClick);
-       }
-
-
-       /**
-       * @type {?Function}
-       */
-       Photo.prototype.onClick = null;
+       };
 
        window.Photo = Photo;
    })();
