@@ -1,7 +1,6 @@
 /* global Resizer: true */
 
 /**
- * @fileoverview
  * @author Igor Alexeenko (o0)
  */
 
@@ -35,15 +34,12 @@
    */
   var filterMap;
 
-  var filterCookie;
-
-
   /**
    * Объект, который занимается кадрированием изображения.
    * @type {Resizer}
    */
   var currentResizer;
-  var DECIMAL = 10;
+
   /**
    * Удаляет текущий объект {@link Resizer}, чтобы создать новый с другим
    * изображением.
@@ -54,34 +50,6 @@
       currentResizer = null;
     }
   }
-    window.addEventListener('resizerchange', resizerChangeHandler);
-
-     function resizerChangeHandler() {
-
-       if(currentResizer) {
-         if(currentResizer.getConstraint().x < 0){
-           currentResizer.setConstraint(0);
-         }
-
-         if(currentResizer.getConstraint().x > currentResizer._image.naturalWidth - currentResizer.getConstraint().side) {
-           currentResizer.setConstraint(currentResizer._image.naturalWidth - currentResizer.getConstraint().side);
-         }
-
-         if(currentResizer.getConstraint().y < 0) {
-           currentResizer.setConstraint(currentResizer.getConstraint().x, 0);
-         }
-
-         if(currentResizer.getConstraint().y > currentResizer._image.naturalHeight - currentResizer.getConstraint().side){
-           currentResizer.setConstraint(currentResizer.getConstraint().x, currentResizer._image.naturalHeight - currentResizer.getConstraint().side);
-         }
-
-
-
-      resizeForm['resize-x'].value = parseInt(currentResizer.getConstraint().x, DECIMAL);
-      resizeForm['resize-y'].value = parseInt(currentResizer.getConstraint().y, DECIMAL);
-      resizeForm['resize-size'].value = parseInt(currentResizer.getConstraint().side, DECIMAL);
-      }
-    }
 
   /**
    * Ставит одну из трех случайных картинок на фон формы загрузки.
@@ -110,8 +78,6 @@
    */
   var resizeForm = document.forms['upload-resize'];
 
-
-
   /**
    * Форма добавления фильтра.
    * @type {HTMLFormElement}
@@ -128,101 +94,33 @@
    */
   var uploadMessage = document.querySelector('.upload-message');
 
-
+  /**
+   * Элементы формы, которые будут использоваться при валидации
+   * @type {HTMLElement}
+   */
   var resizeX = resizeForm['resize-x'];
   var resizeY = resizeForm['resize-y'];
   var resizeSize = resizeForm['resize-size'];
-  var resizeButton = resizeForm['resize-fwd'];
-  var error = document.querySelector('.error');
-
+  var resizeFwd = resizeForm['resize-fwd'];
 
   /**
-   * Проверяет, валидны ли данные, в форме кадрирования.
+   * Проверяет, валидны ли данные в форме кадрирования.
    * @return {boolean}
    */
   function resizeFormIsValid() {
-
-      if((parseInt(resizeX.value) + parseInt(resizeSize.value)) > currentResizer._image.naturalWidth ||
-        (parseInt(resizeX.value) + parseInt(resizeSize.value)) > currentResizer._image.naturalHeight) {
-        resizeButton.setAttribute('disabled', true);
-        resizeButton.classList.add('upload-form-controls-fwd--disabled');
+    if (
+      +resizeX.value + +resizeSize.value > currentResizer._image.naturalWidth ||
+      +resizeY.value + +resizeSize.value > currentResizer._image.naturalHeight
+    ) {
+      resizeFwd.setAttribute('disabled', true);
+      resizeFwd.classList.add('upload-form-controls-fwd--disabled');
       return false;
-
-    }else {
-          resizeButton.removeAttribute('disabled');
-          resizeButton.classList.remove('upload-form-controls-fwd--disabled');
-          return true;
-
+    } else {
+      resizeFwd.removeAttribute('disabled');
+      resizeFwd.classList.remove('upload-form-controls-fwd--disabled');
+      return true;
     }
   }
-   var hours = 24;
-   var minutes = 60;
-   var seconds = 60;
-   var ms = 1000;
-
-  function dayAfterBirthday(birthDay){
-    var oneDay = hours * minutes * seconds * ms;
-    var today = Date.now();
-    var diffInDay = Math.round(Math.abs(today - birthDay / getTime() / oneDay));
-    return diffInDay;
-  }
-
-
-  uploadForm.addEventListener('change', function(event) {
-    resizeFormChangeHandler(event.target);
-
-      currentResize.redraw();
-    });
-
-  function resizeFormChangeHandler(target) {
-    var element = target;
-    if(element.name === 'x')
-    {
-      if(parseInt(element.value) <= 0){
-        element.value = 0;
-        currentResizer.setConstraint(parseInt(element.value));
-      }
-      else if(parseInt(element.value) + currentResizer.getConstraint().side <= currentResizer._image.naturalWidth) {
-        currentResizer.setConstraint(parseInt(element.value));
-      }
-      else {
-        element.value = currentResizer._image.naturalWidth - currentResizer.getConstraint().side;
-        currentResizer.setConstraint(parseInt(element.value));
-      }
-    }
-
-    if(element.name === 'y') {
-      if(parseInt(element.value <= 0)){
-        element.value = 0;
-        currentResizer.setConstraint(parseInt(resizeForm['resize-x'].value), parseInt(resizeForm['resize-y'].value), parseInt(element.value));
-      }
-      else if(parseInt(element.value) + currentResizer.getConstraint().side <= currentResizer._image.naturalHeight) {
-        currentResizer.setConstraint(parseInt(resizeForm['resize-x'].value), parseInt(element.value));
-      }
-      else {
-        element.value = currentResizer._image.naturalHeight - currentResize.getConstraint().side;
-        currentResize.setConstraint(parseInt(resizeForm['resize-x'].value), parseInt(element.value));
-      }
-    }
-
-    if(element.name === 'size'){
-      if(element.value <= 0){
-        element.value = 0;
-        currentResize.setConstraint(parseInt(resizeForm['resize-x'].value), parseInt(resizeForm['resize-y'].value), parseInt(element.value));
-      }
-      else if(element.value <+ Math.min(currentResize._image.naturalWidth - resizeForm['resize-x'].value,
-                                       currentResize._image.naturalHeight - resizeForm['resize-y'].value)) {
-        currentResize.setConstraint(parseInt(resizeForm['resize-x'].value), parseInt(resizeForm['resize-y'].value), parseInt(element.value));
-      }
-      else {
-        element.value = Math.min(currentResize._image.naturalWidth - resizeForm['resize-x'].value,
-                                 currentResize._image.naturalHeight - resizeForm['resize-y'].value);
-        currentResize.setConstraint(parseInt(resizeForm['resize-x'].value), parseInt(resizeForm['resize-y'].value), parseInt(element.value));
-      }
-    }
-
-  }
-
 
   /**
    * @param {Action} action
@@ -270,7 +168,7 @@
 
         showMessage(Action.UPLOADING);
 
-        fileReader.addEventListener('load', function() {
+        fileReader.onload = function() {
           cleanupResizer();
 
           currentResizer = new Resizer(fileReader.result);
@@ -280,20 +178,20 @@
           uploadForm.classList.add('invisible');
           resizeForm.classList.remove('invisible');
 
-        });
-        hideMessage();
-      }
+          hideMessage();
+        };
+
         fileReader.readAsDataURL(element.files[0]);
       } else {
         // Показ сообщения об ошибке, если загружаемый файл, не является
         // поддерживаемым изображением.
         showMessage(Action.ERROR);
       }
-
+    }
   });
 
-  // Функция получения данных из ресайзера загруженного изображения (x, y
-  // и сторона в пикселях) и их записи в  поля формы resizeForm
+  // Функция получения данных из ресайзера загруженного изображения (координаты x, y и
+  // сторона в пикселях) и их записи в поля формы resizeForm.
   function getResizerData() {
     var currentResizerData = currentResizer.getConstraint();
     resizeX.value = Math.floor(currentResizerData.x);
@@ -301,26 +199,25 @@
     resizeSize.value = Math.floor(currentResizerData.side);
   }
 
-
-  // /*
-    //   Обработчик события 'resizerchange' на объекте window.
-    //
-    //  */
-    window.addEventListener('resizerchange', getResizerData);
-
-    // Для улучшения UX валидируем форму еще и на клавиатурных событиях
-    // (по отпускании кнопки).
-    resizeForm.addEventListener('keyup', resizeFormIsValid);
-
-  /*
-    Синхронизация изменения значений полей resizeForm с габаритами окна кадрирования
-    и валидация формы.
+  /**
+   * Обработчик события 'resizerchange' на объекте window.
+   * @param {Event} resizerсhange
+   * @param {function} getResizerData
    */
+  window.addEventListener('resizerchange', getResizerData);
 
-   resizeForm.addEventListener('change', function() {
-    currentResizer.setConstraint(parseInt(resizeX.value), parseInt(resizeY.value),
-      parseInt(resizeSize.value));
-    resizeFormIsValid()
+  // Для улучшения UX валидируем форму еще и на клавиатурных событиях
+  // (по отпускании кнопки).
+  resizeForm.addEventListener('keyup', resizeFormIsValid);
+
+  /**
+   * Синхронизация изменения значений полей resizeForm с габаритами окна кадрирования
+   * и валидация формы.
+   * @param {Event} change
+   */
+  resizeForm.addEventListener('change', function() {
+    currentResizer.setConstraint(+resizeX.value, +resizeY.value, +resizeSize.value);
+    resizeFormIsValid();
   });
 
   /**
@@ -346,18 +243,23 @@
   resizeForm.addEventListener('submit', function(evt) {
     evt.preventDefault();
 
-    if (resizeFormIsValid()) {
+    if (resizeFormIsValid) {
       filterImage.src = currentResizer.exportImage().src;
-
-      filterCookie = docCookies.getItem('filter-cookie');
-      filterCookie = filterCookie || 'none';
-      filterImage.className = 'filter-image-preview filter-' + filterCookie;
-
-      document.getElementById('upload-filter-' + filterCookie).checked = true;
-
 
       resizeForm.classList.add('invisible');
       filterForm.classList.remove('invisible');
+
+      // После ресайза обращаемся к нашей куке и добавляем ее в список классов картинки
+      // как выставленный в последний раз фильтр и, соответственно, переключаем радиокнопку.
+      var filterFromCookie = docCookies.getItem('filter');
+
+      if (filterFromCookie) {
+        filterImage.className = 'filter-image-preview ' + filterFromCookie;
+        filterForm['upload-' + filterFromCookie].setAttribute('checked', true);
+      } else {
+        filterImage.className = 'filter-image-preview filter-none';
+        filterForm['upload-filter-none'].setAttribute('checked', true);
+      }
     }
   });
 
@@ -379,10 +281,27 @@
    */
   filterForm.addEventListener('submit', function(evt) {
     evt.preventDefault();
-    docCookies.setItem('filter-cookie', selectedFilter,
-                         hours * minutes * seconds * ms
-                         * dayAfterBirthday(new Date(1994,7,7)), '/');
 
+    // Вычисляем время, прошедшее после ДР
+    var currentYear = new Date().getFullYear();
+    var recentBirthday = new Date(currentYear, 9, 12);
+
+    // Проверяем, что ДР не больше текущей даты, и при необходимости отнимаем год
+    if (+recentBirthday >= +Date.now()) {
+      recentBirthday.setFullYear(currentYear - 1);
+    }
+
+    var daysPassed = +Date.now() - +recentBirthday;
+    var dateToExpire = +Date.now() + daysPassed;
+    var formattedDateToExpire = new Date(dateToExpire).toUTCString();
+
+    // Запоминаем класс фильтра, который добавляется в список классов изображения
+    // из функции ниже, обращаемся к его классу, превращаем строковой тип
+    // в массив из двух значений методом split и берем второе значение.
+    var defaultFilter = filterImage.className.split(' ')[1];
+
+    // Записываем полученное значение в куку и задаем ей вычисленный выше срок жизни.
+    document.cookie = 'filter=' + defaultFilter + ';expires =' + formattedDateToExpire;
 
     cleanupResizer();
     updateBackground();

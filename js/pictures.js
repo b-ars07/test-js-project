@@ -9,12 +9,15 @@
 
 'use strict';
 
+requirejs.config({
+  baseUrl: 'js'
+});
 
-(function() {
+define(['gallery', 'photo', 'resizer', 'upload'], function(Gallery, Photo) {
   /** @type {HTMLElement} */
   var divPictures = document.querySelector('.pictures');
   /** @type {HTMLElement} */
-  var filterForm = document.querySelector('.filters')
+  var filterForm = document.querySelector('.filters');
   /** @type {HTMLElement} */
   var filters = document.querySelector('.filters-radio');
   /** @type {Array.<string>} */
@@ -39,8 +42,8 @@
   * Добавляем также функцию addPageOnScroll, иначе по клику на фильтр
   * на больших разрешениях выводится только 12 фотографий.
   */
-  filterForm.addEventListener('click', function(event) {
-    var clickedElement = event.target;
+  filterForm.addEventListener('click', function(evt) {
+    var clickedElement = evt.target;
     if(clickedElement.classList.contains('filters-radio')) {
       setActiveFilter(clickedElement.id);
       addPageOnScroll();
@@ -54,7 +57,7 @@
   /**
    * обработчик события scroll
    */
-  window.addEventListener('scroll', function(evt) {
+  window.addEventListener('scroll', function() {
     clearTimeout (scrollTimeout);
     scrollTimeout = setTimeout(addPageOnScroll, SCROLL_TIMEOUT);
   });
@@ -105,8 +108,8 @@
     var pageEnd = pageStart + PAGE_SIZE;
     var pagePictures = picturesToRender.slice(pageStart, pageEnd);
 
-    renderedElements = renderedElements.concat(pagePictures.map(function(picture){
-      var photoElement = new Photo(picture);
+    renderedElements = renderedElements.concat(pagePictures.map(function(item){
+      var photoElement = new Photo(item);
       photoElement.render();
       fragment.appendChild(photoElement.element);
 
@@ -122,6 +125,7 @@
     }));
 
     divPictures.appendChild(fragment);
+    addPageOnScroll();
   }
 
   /** Функция сортировки
@@ -133,7 +137,7 @@
     if (activeFilter === id && !force){
       return;
     }
-
+    //сортировка элементов массива по выбранному фильтру
     filteredPictures = picturesArr.slice(0);
 
     var daysInMonth = 30;
@@ -222,5 +226,4 @@
   }
 
   filterForm.classList.remove('hidden');
-
-})();
+});

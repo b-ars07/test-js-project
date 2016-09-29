@@ -94,15 +94,15 @@
       // canvas'a поэтому важно вовремя поменять их, если нужно начать отрисовку
       // чего-либо с другой обводкой.
 
-      //Толщина линии.
-      this._ctx.lineWidth = 6;
-      //Цвет обводки.
-      this._ctx.strokeStyle = '#ffe753';
-      //Размер штрихов. Первый элемент массива задает длину штриха, второй
-      //расстояние между соседними штрихами.
-      this._ctx.setLineDash([15, 10]);
-      //Смещение первого штриха от начала линии.
-      this._ctx.lineDashOffset = 7;
+      // //Толщина линии.
+      // this._ctx.lineWidth = 6;
+      // //Цвет обводки.
+      // this._ctx.strokeStyle = '#ffe753';
+      // //Размер штрихов. Первый элемент массива задает длину штриха, второй
+      // //расстояние между соседними штрихами.
+      // this._ctx.setLineDash([15, 10]);
+      // //Смещение первого штриха от начала линии.
+      // this._ctx.lineDashOffset = 7;
 
       // Сохранение состояния канваса.
       // Подробней см. строку 132.
@@ -122,53 +122,53 @@
       /**
       * Отрисовка области кадрирования с границей из точек.
       */
-  // var dotSize = 6; // размер такой же, как у прежней штрихованной рамки
-  // var dotNumber = this._resizeConstraint.side / dotSize / 2;
-  // var dotRadius = dotSize / 2;
-  // this._ctx.fillStyle = '#ffe753';
-  //
-  // for (var i = 0; i < dotNumber; i++) {
-  // // В цикле рисуем 4 стороны квадрата с круглой обводкой
-  //   this._ctx.beginPath();
-  //   this._ctx.arc(
-  //     (-this._resizeConstraint.side / 2) - dotRadius + dotSize * i * 2,
-  //     (-this._resizeConstraint.side / 2) - dotRadius,
-  //     dotRadius,
-  //     0,
-  //     Math.PI * 2
-  //   );
-  //   this._ctx.fill();
-  //
-  //   this._ctx.beginPath();
-  //   this._ctx.arc(
-  //     this._resizeConstraint.side / 2 - dotSize,
-  //     (-this._resizeConstraint.side / 2) - dotRadius + dotSize * i * 2,
-  //     dotRadius,
-  //     0,
-  //     Math.PI * 2
-  //   );
-  //   this._ctx.fill();
-  //
-  //   this._ctx.beginPath();
-  //   this._ctx.arc(
-  //     this._resizeConstraint.side / 2 - dotSize - dotSize * i * 2,
-  //     this._resizeConstraint.side / 2 - dotSize,
-  //     dotRadius,
-  //     0,
-  //     Math.PI * 2
-  //   );
-  //   this._ctx.fill();
-  //
-  //   this._ctx.beginPath();
-  //   this._ctx.arc(
-  //     (-this._resizeConstraint.side / 2) - dotRadius,
-  //     this._resizeConstraint.side / 2 - dotSize * i * 2 - dotSize,
-  //     dotRadius,
-  //     0,
-  //     Math.PI * 2
-  //   );
-  //   this._ctx.fill();
-  // }
+  var dotSize = 6; // размер такой же, как у прежней штрихованной рамки
+  var dotNumber = this._resizeConstraint.side / dotSize / 2;
+  var dotRadius = dotSize / 2;
+  this._ctx.fillStyle = '#ffe753';
+
+  for (var i = 0; i < dotNumber; i++) {
+  // В цикле рисуем 4 стороны квадрата с круглой обводкой
+    this._ctx.beginPath();
+    this._ctx.arc(
+      (-this._resizeConstraint.side / 2) - dotRadius + dotSize * i * 2,
+      (-this._resizeConstraint.side / 2) - dotRadius,
+      dotRadius,
+      0,
+      Math.PI * 2
+    );
+    this._ctx.fill();
+
+    this._ctx.beginPath();
+    this._ctx.arc(
+      this._resizeConstraint.side / 2 - dotSize,
+      (-this._resizeConstraint.side / 2) - dotRadius + dotSize * i * 2,
+      dotRadius,
+      0,
+      Math.PI * 2
+    );
+    this._ctx.fill();
+
+    this._ctx.beginPath();
+    this._ctx.arc(
+      this._resizeConstraint.side / 2 - dotSize - dotSize * i * 2,
+      this._resizeConstraint.side / 2 - dotSize,
+      dotRadius,
+      0,
+      Math.PI * 2
+    );
+    this._ctx.fill();
+
+    this._ctx.beginPath();
+    this._ctx.arc(
+      (-this._resizeConstraint.side / 2) - dotRadius,
+      this._resizeConstraint.side / 2 - dotSize * i * 2 - dotSize,
+      dotRadius,
+      0,
+      Math.PI * 2
+    );
+    this._ctx.fill();
+  }
 
       //Отрисовка затемненной области
       this._ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';

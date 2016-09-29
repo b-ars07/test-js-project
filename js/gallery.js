@@ -5,7 +5,7 @@
 
 'use strict';
 
-(function() {
+define(function() {
   /**
    *
    * @constructor
@@ -156,7 +156,7 @@
   * @fires Gallery#h*/
     Gallery.prototype._onPhotoClick = function(evt) {
         if (evt.target.classList.contains('gallery-overlay-image')) {
-          this.setCurrentPicture(++this._currentImage);
+          this.setCurrentPicture(this._currentImage);
           this._setHash(this.pictures[this._currentImage].url);
               }
         };
@@ -178,5 +178,5 @@
 
         }
       };
-    window.Gallery = Gallery;
-})();
+    return Gallery;
+});

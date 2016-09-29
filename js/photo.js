@@ -5,7 +5,7 @@
 
 'use strict';
 
-(function() {
+define(function() {
   /**
   * @constructor
   * @param {Object} data
@@ -83,5 +83,5 @@
          this.element.removeEventListener('click', this._onPhotoClick);
        };
 
-       window.Photo = Photo;
-   })();
+       return Photo;
+   });

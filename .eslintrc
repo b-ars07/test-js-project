@@ -3,6 +3,8 @@ root: true
 globals:
   Backbone: true
   docCookies: true
+  requirejs: true
+  define: true
 
 env:
   browser: true
